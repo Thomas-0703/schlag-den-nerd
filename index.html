@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schlag den Nerd #1</title>
+    <style>
+        body {
+            background-color: #041a06;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 15px;
+        }
+        h1 {
+            font-family: "Times New Roman", Georgia, serif;
+            font-size: 2rem;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        .level-title {
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        /* Nerd horizontal zentriert, Sprüche rechts daneben */
+        .nerd-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            margin: 15px auto 10px auto;
+            min-height: 105px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .nerd-avatar {
+            width: 75px;
+            height: auto;
+            display: block;
+        }
+        .nerd-speech {
+            position: absolute;
+            left: calc(50% + 45px);
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: "Times New Roman", Times, Georgia, serif;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: left;
+            white-space: pre-line;
+            max-width: 185px;
+            pointer-events: none;
+        }
+
+        .puzzle-text {
+            font-family: "Times New Roman", Times, Georgia, serif;
+            font-size: 1.7rem;
+            letter-spacing: 5px;
+            font-weight: bold;
+            margin: 20px auto;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .form-container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            background-color: #2b332c;
+            border: 1px solid #555555;
+            color: #ffffff;
+            box-sizing: border-box;
+            font-size: 1rem;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: #79a77d;
+        }
+        .info-text {
+            font-size: 0.85rem;
+            color: #b0c4b1;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            min-height: 1.2em;
+        }
+        .level-password-display {
+            font-size: 0.9rem;
+            margin-top: 6px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        button {
+            background-color: #8c8c8c;
+            color: #000000;
+            border: 1px solid #ffffff;
+            padding: 6px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        button:hover {
+            background-color: #a8a8a8;
+        }
+        .status-msg {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+
+        /* Schiebepuzzle */
+        #slider-container {
+            display: none;
+            margin: 10px auto 25px auto;
+            max-width: 360px;
+            text-align: center;
+        }
+        #slider-board {
+            width: 300px;
+            height: 300px;
+            margin: 15px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            background-color: #000000;
+            border: 3px solid #79a77d;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            touch-action: manipulation;
+        }
+        .tile {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            user-select: none;
+            box-sizing: border-box;
+            border: 1px solid rgba(0,0,0,0.45);
+            background-color: #f7b733;
+            background-repeat: no-repeat;
+            background-size: 300px 300px, 100% 100%;
+            transition: transform 0.08s ease;
+        }
+        .tile.empty {
+            background: #000000 !important;
+            border: none;
+            cursor: default;
+        }
+        .final-box {
+            background: #0d3810;
+            border: 2px solid #51cf66;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h1>Schlag den Nerd #1</h1>
+    <div id="levelDisplay" class="level-title">LEVEL: 0</div>
+
+    <div class="nerd-container">
+        <img id="nerdDisplay" class="nerd-avatar" src="https://s1.directupload.eu/images/user/261023/n8qv4d3g.png" alt="Nerd">
+        <div id="nerdSpeech" class="nerd-speech"></div>
+    </div>
+
+    <div id="puzzlePrompt" class="puzzle-text">0 G C i d T b d W g</div>
+
+    <div id="quiz-inputs">
+        <label for="answerInput">Lösungsvorschlag:</label>
+        <input type="text" id="answerInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        
+        <div class="info-text">
+            Letzte Eingabe: <span id="lastInputDisplay">keine</span>
+        </div>
+
+        <label for="levelCodeInput">Passwort für anderes Level eingeben:</label>
+        <input type="text" id="levelCodeInput" autocomplete="off">
+
+        <div class="level-password-display">
+            Passwort für dieses Level: <span id="currentLevelPassword"></span>
+        </div>
+
+        <button type="button" onclick="handleSubmit()">Eingaben absenden!</button>
+    </div>
+
+    <div id="slider-container">
+        <p style="font-size: 0.95rem; line-height: 1.4; margin: 0 auto 10px auto; max-width: 320px;">
+            Tippe auf ein Teil neben dem schwarzen Feld, um es zu verschieben:
+        </p>
+        <div id="slider-board"></div>
+        <button type="button" onclick="resetSlider()" style="margin-top: 10px;">Zurücksetzen</button>
+        <div id="slider-solved" class="final-box" style="display: none;">
+            <h3 style="margin-top: 0; color: #51cf66;">Geschafft! Das Puzzle ist gelöst!</h3>
+            <p>Hier sind deine Final-Koordinaten für den Cache:</p>
+            <p id="finalCoordinatesDisplay" style="font-size: 1.4rem; font-weight: bold; letter-spacing: 1px; color: #ffd700;"></p>
+        </div>
+    </div>
+
+    <div id="feedback" class="status-msg"></div>
+</div>
+
+<script>
+    /* Synchrones SHA-256 zur Verifizierung von Lösungen und Passwörtern */
+    function sha256(ascii) {
+        function rightRotate(value, amount) {
+            return (value >>> amount) | (value << (32 - amount));
+        }
+        const mathPow = Math.pow;
+        const maxWord = mathPow(2, 32);
+        let i, j;
+        let result = '';
+        const words = [];
+        const asciiBitLength = ascii.length * 8;
+        
+        const K = [
+            0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+            0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+            0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+            0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+            0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+            0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+            0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+            0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+        ];
+        let H = [
+            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+            0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+        ];
+
+        ascii += '\x80';
+        while (ascii.length % 64 - 56) ascii += '\x00';
+        for (i = 0; i < ascii.length; i++) {
+            j = ascii.charCodeAt(i);
+            words[i >> 2] |= j << ((3 - i) % 4) * 8;
+        }
+        words[words.length] = ((asciiBitLength / maxWord) | 0);
+        words[words.length] = (asciiBitLength) | 0;
+
+        for (j = 0; j < words.length;) {
+            const w = words.slice(j, j += 16);
+            const oldHash = H;
+            H = H.slice(0, 8);
+            for (i = 0; i < 64; i++) {
+                const w15 = w[i - 15], w2 = w[i - 2];
+                const a = H[0], e = H[4];
+                const temp1 = H[7]
+                    + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+                    + ((e & H[5]) ^ ((~e) & H[6]))
+                    + K[i]
+                    + (w[i] = (i < 16) ? w[i] : (
+                            w[i - 16]
+                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                            + w[i - 7]
+                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+                        ) | 0
+                    );
+                const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+                    + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+                H = [(temp1 + temp2) | 0].concat(H);
+                H[4] = (H[4] + temp1) | 0;
+            }
+            for (i = 0; i < 8; i++) {
+                H[i] = (H[i] + oldHash[i]) | 0;
+            }
+        }
+        for (i = 0; i < 8; i++) {
+            for (j = 3; j + 1; j--) {
+                const b = (H[i] >> (j * 8)) & 255;
+                result += ((b < 16) ? '0' : '') + b.toString(16);
+            }
+        }
+        return result;
+    }
+
+    /* Entschlüsselt das nächste Passwort dynamisch mit der eingegebenen Lösung */
+    function decryptPassword(b64Cipher, keyStr) {
+        if (!b64Cipher || !keyStr) return "";
+        try {
+            const raw = atob(b64Cipher);
+            let out = "";
+            for (let i = 0; i < raw.length; i++) {
+                out += String.fromCharCode(raw.charCodeAt(i) ^ keyStr.charCodeAt(i % keyStr.length));
+            }
+            return out;
+        } catch (e) {
+            return "";
+        }
+    }
+
+    const nerdImages = {
+        default: "https://s1.directupload.eu/images/user/261023/n8qv4d3g.png",
+        img1:    "https://s1.directupload.eu/images/user/261023/tneu278a.png",
+        img2:    "https://s1.directupload.eu/images/user/261023/8q89yada.png",
+        img3:    "https://s1.directupload.eu/images/user/261023/u54wgfdv.png",
+        img4:    "https://s1.directupload.eu/images/user/261023/kaaynk5c.png"
+    };
+
+    function setNerdImage(imgKey) {
+        document.getElementById('nerdDisplay').src = nerdImages[imgKey] || nerdImages.default;
+    }
+
+    const nerdJokes = [
+        { text: "'Nein.'", img: "img1" },
+        { text: "'Neinlein!'", img: "img1" },
+        { text: "'Is doch easy..'", img: "img2" },
+        { text: "'Is doch easy..\nFür mich!'", img: "img3" },
+        { text: "'LANGWEILIG!'", img: "img1" },
+        { text: "'UUUAAAHHAA!!'", img: "img4" },
+        { type: "joke", q: "'Ge Ni Tiv ins Wasser'", a: "'Weils Da Tiv ist.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Wer abnimmt..'", a: "'hat mehr vom Telefon.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was ist durchsichtig und riecht nach Karotten?'", a: "'Ein Kaninchenfurz.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Werden Sie Jäger: Lernen Sie schiessen...'", a: "'und treffen Sie neue Freunde.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was macht ein Clown im Büro?'", a: "'Faxen.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was ist braun und sitzt hinter Gittern?'", a: "'Eine Knastanie.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Kommt ein Skellet zum Arzt. Sagt der Arzt:'", a: "'Sie kommen aber reichlich spät.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was ist weiß und stört beim Essen?'", a: "'Eine Lawine.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was hat vier Beine und kann fliegen?'", a: "'Zwei Vögel.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was ist grün und fliegt?'", a: "'Ein ferngesteuertes Essiggürckchen.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Was ist das Gegenteil von Magnet?'", a: "'Mag-schon.'", imgQ: "img1", imgA: "img2" },
+        { type: "joke", q: "'Wie lautet der Vorname vom Reh?'", a: "'Kartoffelpü.'", imgQ: "img1", imgA: "img2" }
+    ];
+
+    let pendingJokePunchline = null;
+    let pendingJokeImg = "img2";
+    let jokeCounter = 0;
+
+    function triggerNerdReaction() {
+        const speechEl = document.getElementById('nerdSpeech');
+        let quote = "";
+        let imgKey = "img1";
+
+        if (pendingJokePunchline) {
+            quote = pendingJokePunchline;
+            imgKey = pendingJokeImg;
+            pendingJokePunchline = null;
+        } else {
+            const currentItem = nerdJokes[jokeCounter % nerdJokes.length];
+            jokeCounter++;
+
+            if (currentItem.type === "joke") {
+                quote = currentItem.q;
+                imgKey = currentItem.imgQ;
+                pendingJokePunchline = currentItem.a;
+                pendingJokeImg = currentItem.imgA;
+            } else {
+                quote = currentItem.text;
+                imgKey = currentItem.img;
+            }
+        }
+
+        speechEl.innerText = quote;
+        setNerdImage(imgKey);
+    }
+
+    function cleanString(str) {
+        return str.toLowerCase()
+                  .replace(/ä/g, 'ae')
+                  .replace(/ö/g, 'oe')
+                  .replace(/ü/g, 'ue')
+                  .replace(/ß/g, 'ss')
+                  .replace(/[^a-z0-9]/g, '');
+    }
+
+    /* Vollständig gehashte und verschlüsselte Leveldaten */
+    const levels = [
+        {
+            level: 0,
+            prompt: "0 G C i d T b d W g",
+            solutionHashes: ["f9119821fb76ec9214ec03aba638085fae7c6b618978ea004d60f53a6fd3341e"],
+            pwHash: "",
+            encPw: ""
+        },
+        {
+            level: 1,
+            prompt: "1 S m n k S",
+            solutionHashes: ["40df3162c027950cb1d06c162cea34a9368a7feb38a6694d8b1f2957232ac153"],
+            pwHash: "fa1cc1c88d86a05c4a55d5541e003c3831818f392756931d1ac3351449795232",
+            encPw: "BQk4LAALMjQ="
+        },
+        {
+            level: 2,
+            prompt: "2 i d k P Z",
+            solutionHashes: ["3c8bffacf4b973888b5eeaf71c43cded37ce9ea009bc29e6cde0920768498785"],
+            pwHash: "52c76cb376907ebc19a92caf01134269e5b109fef005ce63b7c125b04fc9988f",
+            encPw: "QkQQCgZRNBo="
+        },
+        {
+            level: 3,
+            prompt: "3 C m d K B",
+            solutionHashes: ["a0e52f22ae9141fd05c9339b82c9f326a341e437e8b9a6a32fa52d96d70d1090"],
+            pwHash: "ac2221111f308cdd64b799cdcbe60e2a276f30f52a61910140e55a8fc280f497",
+            encPw: "fSAGTQEwBw8="
+        },
+        {
+            level: 4,
+            prompt: "D 4 E F L W E",
+            solutionHashes: ["ac1191947d908b3a24a1b258134f4d8144bc4f7d0b5bdd1068a6cd7c8425d68d"],
+            pwHash: "359439012546516ac9b8030d9d90719be82fa3d9a92b5329d63c630063254661",
+            encPw: "Zig+AlZQIC8="
+        },
+        {
+            level: 5,
+            prompt: "5 F a e H",
+            solutionHashes: ["be0c22f1964dda765e0d492bf135281cbf2bf284cd384057665d56d1c2fc72ca"],
+            pwHash: "365c9349693e2efdc58453ceeeeddd13cb434809078afff0a930c67b035c530a",
+            encPw: "CA83cBZVIDg="
+        },
+        {
+            level: 6,
+            prompt: "6 S h d W",
+            solutionHashes: ["9ff87b5d91113de090c3ad30a87cf2adf18bc7f762a176bcd595ac2d54f84ec7"],
+            pwHash: "32d72cfe9d28ee69398d863cc5cdef073734132438fe1a300c29f9ff7a255f03",
+            encPw: "DFdQWzcCAgA="
+        },
+        {
+            level: 7,
+            prompt: "SW u d 7 Z",
+            solutionHashes: ["daf0ff83585e56945ba2eb60b1a7d6fa2e65a586f6b806ba53a5b402d58c9f79"],
+            pwHash: "35184a811e939f03136c2ae88792be7e69e5f9b8289069e82b6501adc2e71458",
+            encPw: "XDVQCjwhHls="
+        },
+        {
+            level: 8,
+            prompt: "U SS h 8 P",
+            solutionHashes: ["180a20f5e37c9bc77f0cde7ecc733292b085c6a584293978337baac1826cc6a3"],
+            pwHash: "e0fa63c9389504736f3f53dac4702cb3ce1ed70231a8071cb9a1f0e0d01b7a00",
+            encPw: "QlMhHhYyJR4="
+        },
+        {
+            level: 9,
+            prompt: "E SS d b M 9 M",
+            solutionHashes: ["668ad2d00cc5ea260d11136bbe4fc75322c6ca6c75b2c5f613798070ec7b37c2"],
+            pwHash: "871568854a58631a4cbc151ea809c19e01aa318b763b8c063bb35abb35fb536d",
+            encPw: "ORgKKDdLH1c0MQ=="
+        },
+        {
+            level: 10,
+            prompt: "M u d 10 G",
+            solutionHashes: ["7e86f38058bfa1437ad66707ea7c71d7013ea8f6787156b62e157e5c2f56bec9"],
+            pwHash: "b7130e91997269feb136060131577c68948f28b22f6e6f2bbc629495a43e0534",
+            encPw: "FScDDgtUOA0uPQ=="
+        },
+        {
+            level: 11,
+            prompt: "E FBM b a 11 S",
+            solutionHashes: [
+                "4c2dc9cb1236f8f9fb48d282961c90eeb6ae97390509dcf99ec0b3f7e74f8f7a",
+                "390cecd559f69f24e030b84fb4e55308b78824c6b36a070ee6b5e36b7223b1ed"
+            ],
+            pwHash: "9ada8253ff96147286c9ee101edfdc08f1a6c103406c1326c8fe74e3738d955c",
+            encPw: "PwlCPCo9JClVXA=="
+        },
+        {
+            level: 12,
+            prompt: "12 M h d J",
+            solutionHashes: ["dcbe637f2f7e4efaa93d2c839e95395c368b61cbe535204419177a9cf36c2cb2"],
+            pwHash: "99c54413c3a75cb9ace51168b00acf315383152e5b37d6ceb3c644b9f621c34f",
+            encPw: "IAErMyonH0MkFw=="
+        },
+        {
+            level: 13,
+            prompt: "13 i k GZ",
+            solutionHashes: ["43361a05c9abce39cc0ded6a9b12eb5981e832ef826f70faec2404c433ec474a"],
+            pwHash: "f6d7e762ceb118ce83f14a57324403136d2cb3037d33b649aab0c663a31a7ee0",
+            encPw: "a349PVpRQzZeMA=="
+        },
+        {
+            level: 14,
+            prompt: "",
+            solutionHashes: [],
+            pwHash: "01f1f1a18c934ab343daeee52cf0f4bbbe6d2e51cc3a168c5dd0aca77efd0cd2",
+            encPw: "AAMsJxwJUCwPUhI=",
+            isGameLevel: true
+        }
+    ];
+
+    let currentLevelIdx = 0;
+    let currentPasswordPlain = "";
+
+    function renderLevel() {
+        const cur = levels[currentLevelIdx];
+        document.getElementById('levelDisplay').innerText = "LEVEL: " + cur.level;
+        document.getElementById('currentLevelPassword').innerText = currentPasswordPlain;
+        document.getElementById('answerInput').value = "";
+        document.getElementById('levelCodeInput').value = "";
+        document.getElementById('nerdSpeech').innerText = "";
+        document.getElementById('feedback').innerText = "";
+        pendingJokePunchline = null;
+
+        setNerdImage('default');
+
+        const quizInputs = document.getElementById('quiz-inputs');
+        const sliderContainer = document.getElementById('slider-container');
+        const promptEl = document.getElementById('puzzlePrompt');
+
+        if (cur.isGameLevel) {
+            quizInputs.style.display = "none";
+            sliderContainer.style.display = "block";
+            promptEl.style.whiteSpace = "normal";
+            promptEl.style.letterSpacing = "0";
+            promptEl.innerHTML = `
+                <div style="max-width: 440px; margin: 0 auto; text-align: center; font-size: 0.95rem; line-height: 1.45;">
+                    <div style="font-size: 1.4rem; font-weight: bold; margin-bottom: 8px; color: #ffffff;">Du hast dich sehr gut geschlagen!</div>
+                    <div style="margin-bottom: 10px; color: #b0c4b1;">
+                        Doch jetzt holt der Nerd noch eine Gemeinheit für dich bereit: <strong>sein Lieblingsspiel</strong>.<br>
+                        Das musst du erfolgreich lösen, um an die Cache-Koordinaten zu kommen.
+                    </div>
+                </div>
+            `;
+            initSlider();
+        } else {
+            quizInputs.style.display = "block";
+            sliderContainer.style.display = "none";
+            promptEl.style.whiteSpace = "nowrap";
+            promptEl.style.letterSpacing = "5px";
+            promptEl.innerText = cur.prompt;
+        }
+    }
+
+    function handleSubmit() {
+        const answerInput = document.getElementById('answerInput').value.trim();
+        const levelCodeInput = document.getElementById('levelCodeInput').value.trim();
+        const feedback = document.getElementById('feedback');
+
+        feedback.className = "status-msg";
+        feedback.innerText = "";
+
+        // 1. Level-Sprung: Prüfung rein über SHA-256 (Passwörter stehen nirgends im Klartext)
+        if (levelCodeInput !== "") {
+            const inputPwHash = sha256(levelCodeInput.toLowerCase());
+            const foundIdx = levels.findIndex(l => l.pwHash && l.pwHash === inputPwHash);
+            
+            if (foundIdx !== -1) {
+                currentLevelIdx = foundIdx;
+                currentPasswordPlain = levelCodeInput;
+                feedback.className = "status-msg success";
+                feedback.innerText = "Level geladen!";
+                renderLevel();
+                return;
+            } else {
+                feedback.className = "status-msg error";
+                feedback.innerText = "Ungültiges Level-Passwort!";
+                return;
+            }
+        }
+
+        // 2. Antwort prüfen (Lösung wird gehasht verglichen; entschlüsselt nächstes Passwort)
+        if (answerInput !== "" && !levels[currentLevelIdx].isGameLevel) {
+            document.getElementById('lastInputDisplay').innerText = answerInput;
+            const cleaned = cleanString(answerInput);
+            const inputHash = sha256(cleaned);
+            const cur = levels[currentLevelIdx];
+
+            if (cur.solutionHashes.includes(inputHash)) {
+                const nextIdx = currentLevelIdx + 1;
+                if (nextIdx < levels.length) {
+                    currentPasswordPlain = decryptPassword(levels[nextIdx].encPw, cleaned);
+                }
+                currentLevelIdx = nextIdx;
+                feedback.className = "status-msg success";
+                feedback.innerText = "Richtig! Weiter geht's...";
+                renderLevel();
+            } else {
+                triggerNerdReaction();
+                document.getElementById('answerInput').value = "";
+            }
+        }
+    }
+
+    /* Schiebepuzzle: nerd2 + Oranger Farbverlauf (Garantiert lösbare Belegung) */
+    const puzzleImg = "https://s1.directupload.eu/images/user/261023/8q89yada.png";
+
+    const initialBoard = [4, 7, 1, 3, 0, 2, 6, 5, 8];
+    const initialEmpty = 8;
+
+    let boardState = [...initialBoard];
+    let emptyPos = initialEmpty;
+    let isGameSolved = false;
+
+    function initSlider() {
+        isGameSolved = false;
+        document.getElementById('slider-solved').style.display = "none";
+        resetSlider();
+    }
+
+    function resetSlider() {
+        if (isGameSolved) return;
+        boardState = [...initialBoard];
+        emptyPos = initialEmpty;
+        renderBoard();
+    }
+
+    function renderBoard() {
+        const board = document.getElementById('slider-board');
+        board.innerHTML = "";
+
+        boardState.forEach((tileIndex, pos) => {
+            const div = document.createElement('div');
+            div.className = "tile";
+
+            if (tileIndex === 8) {
+                div.classList.add('empty');
+            } else {
+                div.style.backgroundImage = `url("${puzzleImg}"), linear-gradient(135deg, #fc4a1a, #f7b733)`;
+                const origX = (tileIndex % 3) * -100;
+                const origY = Math.floor(tileIndex / 3) * -100;
+                div.style.backgroundPosition = `${origX}px ${origY}px, center`;
+            }
+
+            div.onclick = () => moveTile(pos);
+            board.appendChild(div);
+        });
+    }
+
+    function moveTile(pos) {
+        if (isGameSolved) return;
+
+        const row = Math.floor(pos / 3);
+        const col = pos % 3;
+        const emptyRow = Math.floor(emptyPos / 3);
+        const emptyCol = emptyPos % 3;
+
+        const isAdjacent = (Math.abs(row - emptyRow) + Math.abs(col - emptyCol)) === 1;
+
+        if (isAdjacent) {
+            boardState[emptyPos] = boardState[pos];
+            boardState[pos] = 8;
+            emptyPos = pos;
+            renderBoard();
+            checkSolved();
+        }
+    }
+
+    function checkSolved() {
+        const solved = boardState.every((val, index) => val === index);
+        if (solved) {
+            isGameSolved = true;
+            document.getElementById('slider-solved').style.display = "block";
+            const tiles = document.querySelectorAll('.tile');
+            if (tiles[8]) {
+                tiles[8].classList.remove('empty');
+                tiles[8].style.backgroundImage = `url("${puzzleImg}"), linear-gradient(135deg, #fc4a1a, #f7b733)`;
+                tiles[8].style.backgroundPosition = "-200px -200px, center";
+            }
+            
+            // Koordinaten werden erst mit dem gelösten Puzzle-Zustand per XOR entschlüsselt
+            const key = boardState.join('') + "_solved";
+            const cipher = atob("fhEGC4QVAwUWbEZeS1ZFIRABAwKEFQcFFmpKWks=");
+            let coords = "";
+            for (let i = 0; i < cipher.length; i++) {
+                coords += String.fromCharCode(cipher.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            document.getElementById('finalCoordinatesDisplay').innerText = coords;
+        }
+    }
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !levels[currentLevelIdx].isGameLevel) {
+            handleSubmit();
+            return;
+        }
+        if (levels[currentLevelIdx].isGameLevel && !isGameSolved) {
+            const emptyRow = Math.floor(emptyPos / 3);
+            const emptyCol = emptyPos % 3;
+            let targetPos = -1;
+
+            if (event.key === "ArrowUp" && emptyRow < 2) targetPos = emptyPos + 3;
+            if (event.key === "ArrowDown" && emptyRow > 0) targetPos = emptyPos - 3;
+            if (event.key === "ArrowLeft" && emptyCol < 2) targetPos = emptyPos + 1;
+            if (event.key === "ArrowRight" && emptyCol > 0) targetPos = emptyPos - 1;
+
+            if (targetPos !== -1) {
+                moveTile(targetPos);
+            }
+        }
+    });
+
+    renderLevel();
+</script>
+
+</body>
+</html>
