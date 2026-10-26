@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schlag den Nerd</title>
+  <style>
+    body {
+      background-color: #041a06;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 30px 15px 40px 15px;
+      transition: background-color 0.4s ease;
+    }
+
+    body.theme-part1 { background-color: #041a06; }
+    body.theme-part2 { background-color: #000052; }
+    body.theme-part3 { background-color: #3e0704; }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      max-width: 480px;
+      margin: 0 auto 35px auto;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.88rem;
+    }
+    .top-link {
+      color: #b0c4b1;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 0.88rem;
+      padding: 4px;
+      box-shadow: none;
+    }
+    .top-link:hover {
+      color: #ffffff;
+      text-decoration: none;
+      background: none;
+    }
+
+    h1 {
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 2.1rem;
+      margin: 15px 0 6px 0;
+      font-weight: normal;
+    }
+    .level-title {
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 1.1rem;
+      margin-top: 8px;
+      margin-bottom: 14px;
+    }
+
+    .nerd-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 15px auto 10px auto;
+      min-height: 125px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .nerd-avatar {
+      width: 95px;
+      height: auto;
+      display: block;
+    }
+    .nerd-speech {
+      position: absolute;
+      left: calc(50% + 55px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-align: left;
+      white-space: pre-line;
+      max-width: 195px;
+      pointer-events: none;
+    }
+
+    .puzzle-text {
+      font-family: "Times New Roman", Times, Georgia, serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      font-weight: bold;
+      margin: 20px auto;
+      text-align: center;
+      white-space: normal;
+      max-width: 520px;
+    }
+    .form-container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      background-color: #2b332c;
+      border: 1px solid #555555;
+      color: #ffffff;
+      box-sizing: border-box;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+    }
+    input[type="text"]:focus {
+      border-color: #79a77d;
+    }
+    .info-text {
+      font-size: 0.85rem;
+      color: #b0c4b1;
+      margin-top: 6px;
+      margin-bottom: 18px;
+      min-height: 1.2em;
+    }
+    .level-password-display {
+      font-size: 0.9rem;
+      margin-top: 6px;
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+    button {
+      background-color: #8c8c8c;
+      color: #000000;
+      border: 1px solid #ffffff;
+      padding: 6px 18px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    button:hover {
+      background-color: #a8a8a8;
+    }
+    .status-msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .error { color: #ff6b6b; }
+    .success { color: #51cf66; }
+
+    #slider-container {
+      display: none;
+      margin: 10px auto 25px auto;
+      max-width: 380px;
+      text-align: center;
+    }
+    #slider-board {
+      margin: 15px auto;
+      display: grid;
+      background-color: #000000;
+      border: 3px solid #79a77d;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+      touch-action: manipulation;
+    }
+    .tile {
+      cursor: pointer;
+      user-select: none;
+      box-sizing: border-box;
+      border: 1px solid rgba(0,0,0,0.45);
+      background-color: #f7b733;
+      background-repeat: no-repeat;
+      transition: transform 0.08s ease;
+      position: relative;
+    }
+    .tile.empty {
+      background: #000000 !important;
+      border: none;
+      cursor: default;
+    }
+
+    .final-box {
+      background: #0d3810;
+      border: 2px solid #51cf66;
+      padding: 20px 15px;
+      border-radius: 8px;
+      margin-top: 25px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    }
+    .final-box h3 {
+      margin: 0 0 10px 0;
+      color: #51cf66;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .final-box p {
+      margin: 8px 0;
+      font-size: 0.95rem;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+    .final-box .final-coords {
+      font-size: 1.4rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #ffd700;
+      font-family: monospace;
+      margin: 14px 0 15px 0;
+    }
+    .next-part-btn {
+      display: inline-block;
+      margin-top: 10px;
+      background-color: #2b6cb0;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      padding: 8px 18px;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+    .next-part-btn:hover {
+      background-color: #3182ce;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .modal-card {
+      background-color: #0c180e;
+      border: 2px solid #79a77d;
+      border-radius: 8px;
+      max-width: 520px;
+      width: 100%;
+      padding: 22px;
+      box-sizing: border-box;
+      text-align: left;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 25px rgba(0,0,0,0.9);
+    }
+    .modal-card h2 {
+      margin-top: 0;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 1.6rem;
+      color: #51cf66;
+      text-align: center;
+    }
+    .modal-close-btn {
+      display: block;
+      margin: 15px auto 5px auto;
+      background-color: #2b6cb0;
+      color: #ffffff;
+      border: 1px solid #ffffff;
+      padding: 8px 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .copy-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .copy-input {
+      font-size: 0.72rem !important;
+      padding: 6px 8px !important;
+      background: #1a202c !important;
+      border: 1px solid #4a5568 !important;
+      color: #e2e8f0 !important;
+      text-align: left !important;
+      font-family: monospace !important;
+      flex: 1;
+    }
+    .copy-btn {
+      background-color: #2d3748;
+      color: #e2e8f0;
+      border: 1px solid #718096;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      box-shadow: none;
+      border-radius: 2px;
+    }
+    .copy-btn:hover {
+      background-color: #4a5568;
+    }
+    .copy-btn.copied {
+      background-color: #276749;
+      border-color: #48bb78;
+      color: #ffffff;
+    }
+
+    .no-break {
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="theme-part1">
+
+<div class="top-bar">
+  <button class="top-link" onclick="openIntroModal()">ℹ️ Spielregeln</button>
+  <button class="top-link" onclick="openUrkundenModal()">📜 Urkunde</button>
+</div>
+
+<div class="form-container">
+  <h1 id="mainTitle">Schlag den Nerd #1</h1>
+  <div id="levelDisplay" class="level-title">LEVEL: 0</div>
+
+  <div class="nerd-container">
+    <img id="nerdDisplay" class="nerd-avatar" src="https://s1.directupload.eu/images/user/261023/n8qv4d3g.png" alt="Nerd">
+    <div id="nerdSpeech" class="nerd-speech"></div>
+  </div>
+
+  <div id="puzzlePrompt" class="puzzle-text">0 G C i d T b d W g</div>
+
+  <div id="quiz-inputs">
+    <label for="answerInput">Lösungsvorschlag:</label>
+    <input type="text" id="answerInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter') handleSubmit();">
+    
+    <div class="info-text">
+      Letzte Eingabe: <span id="lastInputDisplay">keine</span>
+    </div>
+
+    <label for="levelCodeInput">Passwort für anderes Level eingeben:</label>
+    <input type="text" id="levelCodeInput" autocomplete="off" onkeydown="if(event.key==='Enter') handleSubmit();">
+
+    <div class="level-password-display">
+      Passwort für dieses Level: <span id="currentLevelPassword"></span>
+    </div>
+
+    <button type="button" onclick="handleSubmit()">Eingaben absenden!</button>
+  </div>
+
+  <div id="slider-container">
+    <p id="sliderInfoText" style="font-size: 0.95rem; line-height: 1.4; margin: 0 auto 10px auto; max-width: 320px;">
+      Tippe auf ein Teil neben dem schwarzen Feld, um es zu verschieben:
+    </p>
+    <div id="slider-board"></div>
+    <button type="button" onclick="resetSlider()" style="margin-top: 10px;">Zurücksetzen</button>
+    
+    <div id="slider-solved" class="final-box" style="display: none;">
+      <h3 id="solvedTitle">Geschafft! Das Puzzle ist gelöst!</h3>
+      <p id="solvedSubtext">Hier sind deine Final-Koordinaten für den Cache:</p>
+      <div id="finalCoordinatesDisplay" class="final-coords"></div>
+      
+      <button type="button" id="nextPartButton" class="next-part-btn" style="display: none;" onclick="goToNextPart()">Weiter zu Schlag den Nerd #2</button>
+      <button type="button" id="showUrkundeAfterFinaleBtn" class="next-part-btn" style="display: none; background-color: #276749;" onclick="openUrkundenModal()">📜 Zur offiziellen Urkunde</button>
+    </div>
+  </div>
+
+  <div id="feedback" class="status-msg"></div>
+</div>
+
+<div id="introModal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <h2>Spielregeln</h2>
+    <p style="margin-bottom: 12px;">Finde die gesuchten Begriffe und schlage den Nerd in drei Teilen (#1, #2 und #3):</p>
+    
+    <ul style="padding-left: 20px; margin: 0 0 18px 0; line-height: 1.6;">
+      <li><strong>Eingabe:</strong> Alles kleinschreiben, keine Leerzeichen, Umlaute ausschreiben <span class="no-break">(ä = ae)</span>, Zahlen als Ziffern.</li>
+      <li><strong>Ablauf:</strong> Ein Level nach dem anderen lösen. Über das Level-Passwort kannst du jederzeit wieder einsteigen.</li>
+      <li><strong>Schiebepuzzle:</strong> In Level 14, 28 und 42 wartet das Puzzle für die Finalkoordinaten[cite: 12].</li>
+      <li><strong>Urkunde:</strong> Notiere dir vor Ort den Satz vom Logbuch-Deckblatt des Finales (#3), um dir am Ende die offizielle Urkunde abzuholen.</li>
+    </ul>
+
+    <button type="button" class="modal-close-btn" onclick="closeIntroModal()">Verstanden & Los!</button>
+  </div>
+</div>
+
+<div id="urkundenModal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <h2>Offizielle Urkunde</h2>
+    
+    <div id="urkundeInputsArea">
+      <p style="font-size: 0.9rem; color: #cbd5e0; margin-bottom: 15px;">
+        Du hast das Finale bezwungen? Trage hier den Satz vom Deckblatt des Final-Logbuchs (#3) als <strong>Nerd-Code</strong> ein (Anfangsbuchstaben der Wörter, Substantive GROSS, Füllwörter klein):
+      </p>
+
+      <label style="font-size: 0.85rem; text-align: left;">Nerd-Code vom Logbuch-Deckblatt #3:</label>
+      <input type="text" id="logCode3Input" placeholder="Code aus Dose 3..." style="margin-bottom: 14px; text-align: left;">
+
+      <div id="urkundeError" class="status-msg error" style="display: none; margin-bottom: 12px;"></div>
+
+      <button type="button" class="modal-close-btn" style="background-color: #276749; margin-top: 5px;" onclick="verifyMasterUrkunde()">Urkunde freischalten</button>
+      <button type="button" class="top-link" style="display: block; margin: 10px auto 0 auto;" onclick="closeUrkundenModal()">Schließen</button>
+    </div>
+
+    <div id="unlockedUrkundeArea" style="display: none; text-align: center;">
+      <p style="font-size: 1.05rem; color: #51cf66; font-weight: bold; margin-top: 0;">
+        Hervorragend! Der Code ist korrekt.
+      </p>
+      <p style="font-size: 0.9rem; color: #e2e8f0; line-height: 1.4; margin-bottom: 20px;">
+        Du hast die Prüfung bestanden und darfst ab sofort den Titel <em>„Bezwinger des Nerd“</em> führen. Hier kannst du dir deine offizielle Urkunde als Original-PDF herunterladen:
+      </p>
+
+      <a id="downloadPdfLink" href="#" target="_blank" download="Urkunde_Bezwinger_des_Nerd.pdf" class="modal-close-btn" style="background-color: #276749; margin-bottom: 22px;">
+        📄 Original-Urkunde herunterladen (PDF)
+      </a>
+
+      <div style="font-size: 0.82rem; margin: 15px 0 6px 0; color: #a0aec0; text-align: left;">Deine Profil-Banner für geocaching.com:</div>
+      
+      <div style="font-size: 0.75rem; text-align: left; color: #cbd5e0; margin-bottom: 3px;">Banner 1:</div>
+      <div class="copy-group">
+        <input type="text" id="bannerCode1" class="copy-input" readonly value="">
+        <button type="button" class="copy-btn" title="In die Zwischenablage kopieren" onclick="copyBanner('bannerCode1', this)">📋</button>
+      </div>
+      
+      <div style="font-size: 0.75rem; text-align: left; color: #cbd5e0; margin-bottom: 3px;">Banner 2:</div>
+      <div class="copy-group">
+        <input type="text" id="bannerCode2" class="copy-input" readonly value="">
+        <button type="button" class="copy-btn" title="In die Zwischenablage kopieren" onclick="copyBanner('bannerCode2', this)">📋</button>
+      </div>
+      
+      <button type="button" class="top-link" style="display: block; margin: 18px auto 0 auto;" onclick="closeUrkundenModal()">Zurück zum Spiel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function sha256(ascii) {
+    function rightRotate(value, amount) {
+      return (value >>> amount) | (value << (32 - amount));
+    }
+    const mathPow = Math.pow;
+    const maxWord = mathPow(2, 32);
+    let i, j;
+    let result = '';
+    const words = [];
+    const asciiBitLength = ascii.length * 8;
+    
+    const K = [
+      0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+      0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+      0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+      0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+      0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+      0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+      0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+      0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+    let H = [
+      0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+      0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    ];
+
+    ascii += '\x80';
+    while (ascii.length % 64 - 56) ascii += '\x00';
+    for (i = 0; i < ascii.length; i++) {
+      j = ascii.charCodeAt(i);
+      words[i >> 2] |= j << ((3 - i % 4) * 8);
+    }
+    words[words.length] = ((asciiBitLength / maxWord) | 0);
+    words[words.length] = (asciiBitLength) | 0;
+
+    for (j = 0; j < words.length;) {
+      const w = words.slice(j, j += 16);
+      const oldHash = H;
+      H = H.slice(0, 8);
+      for (i = 0; i < 64; i++) {
+        const w15 = w[i - 15], w2 = w[i - 2];
+        const a = H[0], e = H[4];
+        const temp1 = H[7]
+          + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+          + ((e & H[5]) ^ ((~e) & H[6]))
+          + K[i]
+          + (w[i] = (i < 16) ? w[i] : (
+            w[i - 16]
+            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+            + w[i - 7]
+            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+          ) | 0);
+        const temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+          + ((a & H[1]) ^ (a & H[2]) ^ (H[1] & H[2]));
+        H = [(temp1 + temp2) | 0].concat(H);
+        H[4] = (H[4] + temp1) | 0;
+      }
+      for (i = 0; i < 8; i++) {
+        H[i] = (H[i] + oldHash[i]) | 0;
+      }
+    }
+    for (i = 0; i < 8; i++) {
+      for (j = 3; j + 1; j--) {
+        const b = (H[i] >> (j * 8)) & 255;
+        result += ((b < 16) ? '0' : '') + b.toString(16);
+      }
+    }
+    return result;
+  }
+
+  function decryptPassword(b64Cipher, keyStr) {
+    if (!b64Cipher || !keyStr) return "";
+    try {
+      const raw = atob(b64Cipher);
+      let out = "";
+      for (let i = 0; i < raw.length; i++) {
+        out += String.fromCharCode(raw.charCodeAt(i) ^ keyStr.charCodeAt(i % keyStr.length));
+      }
+      return out;
+    } catch (e) {
+      return "";
+    }
+  }
+
+  const nerdImages = {
+    default: "https://s1.directupload.eu/images/user/261023/n8qv4d3g.png",
+    img1: "https://s1.directupload.eu/images/user/261023/tneu278a.png",
+    img2: "https://s1.directupload.eu/images/user/261023/8q89yada.png",
+    img3: "https://s1.directupload.eu/images/user/261023/u54wgfdv.png",
+    img4: "https://s1.directupload.eu/images/user/261023/kaaynk5c.png"
+  };
+
+  function setNerdImage(imgKey) {
+    document.getElementById('nerdDisplay').src = nerdImages[imgKey] || nerdImages.default;
+  }
+
+  const nerdJokes = [
+    { text: "'Nein.'", img: "img1" },
+    { text: "'Neinlein!'", img: "img1" },
+    { text: "'Is doch easy..'", img: "img2" },
+    { text: "'Is doch easy..\nFür mich!'", img: "img3" },
+    { text: "'LANGWEILIG!'", img: "img1" },
+    { text: "'UUUAAAHHAA!!'", img: "img4" },
+    { type: "joke", q: "'Ge Ni Tiv ins Wasser'", a: "'Weils Da Tiv ist.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Wer abnimmt..'", a: "'hat mehr vom Telefon.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was ist durchsichtig und riecht nach Karotten?'", a: "'Ein Kaninchenfurz.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Werden Sie Jäger: Lernen Sie schiessen...'", a: "'und treffen Sie neue Freunde.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was macht ein Clown im Büro?'", a: "'Faxen.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was ist braun und sitzt hinter Gittern?'", a: "'Eine Knastanie.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Kommt ein Skellet zum Arzt. Sagt der Arzt:'", a: "'Sie kommen aber reichlich spät.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was ist weiß und stört beim Essen?'", a: "'Eine Lawine.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was hat vier Beine und kann fliegen?'", a: "'Zwei Vögel.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was ist grün und fliegt?'", a: "'Ein ferngesteuertes Essiggürckchen.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Was ist das Gegenteil von Magnet?'", a: "'Mag-schon.'", imgQ: "img1", imgA: "img2" },
+    { type: "joke", q: "'Wie lautet der Vorname vom Reh?'", a: "'Kartoffelpü.'", imgQ: "img1", imgA: "img2" }
+  ];
+
+  let pendingJokePunchline = null;
+  let pendingJokeImg = "img2";
+  let jokeCounter = 0;
+
+  function triggerNerdReaction() {
+    const speechEl = document.getElementById('nerdSpeech');
+    let quote = "";
+    let imgKey = "img1";
+
+    if (pendingJokePunchline) {
+      quote = pendingJokePunchline;
+      imgKey = pendingJokeImg;
+      pendingJokePunchline = null;
+    } else {
+      const currentItem = nerdJokes[jokeCounter % nerdJokes.length];
+      jokeCounter++;
+
+      if (currentItem.type === "joke") {
+        quote = currentItem.q;
+        imgKey = currentItem.imgQ;
+        pendingJokePunchline = currentItem.a;
+        pendingJokeImg = currentItem.imgA;
+      } else {
+        quote = currentItem.text;
+        imgKey = currentItem.img;
+      }
+    }
+
+    speechEl.innerText = quote;
+    setNerdImage(imgKey);
+  }
+
+  function cleanString(str) {
+    return (str || "").toLowerCase()
+      .replace(/ä/g, 'ae')
+      .replace(/ö/g, 'oe')
+      .replace(/ü/g, 'ue')
+      .replace(/ß/g, 'ss')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  /* Exakt verifizierte Hashes für alle 43 Levels */
+  const levels = [
+    { level: 0, part: 1, prompt: "0 G C i d T b d W g", solutionHashes: ["f9119821fb76ec9214ec03aba638085fae7c6b618978ea004d60f53a6fd3341e"], pwHashes: [], encPw: "", isGameLevel: false },
+    { level: 1, part: 1, prompt: "1 S m n k S", solutionHashes: ["40df3162c027950cb1d06c162cea34a9368a7feb38a6694d8b1f2957232ac153"], pwHashes: ["fa1cc1c88d86a05c4a55d5541e003c3831818f392756931d1ac3351449795232"], encPw: "BQk4LAALMjQ=", isGameLevel: false },
+    { level: 2, part: 1, prompt: "2 i d k P Z", solutionHashes: ["3c8bffacf4b973888b5eeaf71c43cded37ce9ea009bc29e6cde0920768498785"], pwHashes: ["52c76cb376907ebc19a92caf01134269e5b109fef005ce63b7c125b04fc9988f"], encPw: "QkQQCgZRNBo=", isGameLevel: false },
+    { level: 3, part: 1, prompt: "3 C m d K B", solutionHashes: ["a0e52f22ae9141fd05c9339b82c9f326a341e437e8b9a6a32fa52d96d70d1090"], pwHashes: ["ac2221111f308cdd64b799cdcbe60e2a276f30f52a61910140e55a8fc280f497"], encPw: "fSAGTQEwBw8=", isGameLevel: false },
+    { level: 4, part: 1, prompt: "D 4 E F L W E", solutionHashes: ["ac1191947d908b3a24a1b258134f4d8144bc4f7d0b5bdd1068a6cd7c8425d68d"], pwHashes: ["359439012546516ac9b8030d9d90719be82fa3d9a92b5329d63c630063254661"], encPw: "Zig+AlZQIC8=", isGameLevel: false },
+    { level: 5, part: 1, prompt: "5 F a e H", solutionHashes: ["be0c22f1964dda765e0d492bf135281cbf2bf284cd384057665d56d1c2fc72ca"], pwHashes: ["365c9349693e2efdc58453ceeeeddd13cb434809078afff0a930c67b035c530a"], encPw: "CA83cBZVIDg=", isGameLevel: false },
+    { level: 6, part: 1, prompt: "6 S h d W", solutionHashes: ["9ff87b5d91113de090c3ad30a87cf2adf18bc7f762a176bcd595ac2d54f84ec7"], pwHashes: ["32d72cfe9d28ee69398d863cc5cdef073734132438fe1a300c29f9ff7a255f03"], encPw: "DFdQWzcCAgA=", isGameLevel: false },
+    { level: 7, part: 1, prompt: "SW u d 7 Z", solutionHashes: ["daf0ff83585e56945ba2eb60b1a7d6fa2e65a586f6b806ba53a5b402d58c9f79"], pwHashes: ["35184a811e939f03136c2ae88792be7e69e5f9b8289069e82b6501adc2e71458"], encPw: "XDVQCjwhHls=", isGameLevel: false },
+    { level: 8, part: 1, prompt: "U SS h 8 P", solutionHashes: ["180a20f5e37c9bc77f0cde7ecc733292b085c6a584293978337baac1826cc6a3"], pwHashes: ["e0fa63c9389504736f3f53dac4702cb3ce1ed70231a8071cb9a1f0e0d01b7a00"], encPw: "QlMhHhYyJR4=", isGameLevel: false },
+    { level: 9, part: 1, prompt: "E SS d b M 9 M", solutionHashes: ["668ad2d00cc5ea260d11136bbe4fc75322c6ca6c75b2c5f613798070ec7b37c2"], pwHashes: ["871568854a58631a4cbc151ea809c19e01aa318b763b8c063bb35abb35fb536d"], encPw: "ORgKKDdLH1c0MQ==", isGameLevel: false },
+    { level: 10, part: 1, prompt: "M u d 10 G", solutionHashes: ["7e86f38058bfa1437ad66707ea7c71d7013ea8f6787156b62e157e5c2f56bec9"], pwHashes: ["b7130e91997269feb136060131577c68948f28b22f6e6f2bbc629495a43e0534"], encPw: "FScDDgtUOA0uPQ==", isGameLevel: false },
+    { level: 11, part: 1, prompt: "E FBM b a 11 S", solutionHashes: ["4c2dc9cb1236f8f9fb48d282961c90eeb6ae97390509dcf99ec0b3f7e74f8f7a"], pwHashes: ["9ada8253ff96147286c9ee101edfdc08f1a6c103406c1326c8fe74e3738d955c"], encPw: "PwlCPCo9JClVXA==", isGameLevel: false },
+    { level: 12, part: 1, prompt: "12 M h d J", solutionHashes: ["dcbe637f2f7e4efaa93d2c839e95395c368b61cbe535204419177a9cf36c2cb2"], pwHashes: ["99c54413c3a75cb9ace51168b00acf315383152e5b37d6ceb3c644b9f621c34f"], encPw: "IAErMyonH0MkFw==", isGameLevel: false },
+    { level: 13, part: 1, prompt: "13 i k GZ", solutionHashes: ["43361a05c9abce39cc0ded6a9b12eb5981e832ef826f70faec2404c433ec474a"], pwHashes: ["f6d7e762ceb118ce83f14a57324403136d2cb3037d33b649aab0c663a31a7ee0"], encPw: "a349PVpRQzZeMA==", isGameLevel: false },
+    { level: 14, part: 1, prompt: "", solutionHashes: [], pwHashes: ["01f1f1a18c934ab343daeee52cf0f4bbbe6d2e51cc3a168c5dd0aca77efd0cd2"], encPw: "AAMsJxwJUCwPUhI=", isGameLevel: true, gridCols: 3, gridRows: 3, gamePart: 1 },
+    { level: 15, part: 2, prompt: "RM h a e M a 14 AT b", solutionHashes: ["ef28184ca394efe96ef77f6851cd7cd0a4a46e26aab6b6d11c8be24fb449f76d"], pwHashes: ["0e426b4fec5fef20b0f67a054de12d40c64dc34a055adeb6b268efbb83fed65f"], encPw: "IAw0DlEeLwdYDw==", isGameLevel: false },
+    { level: 16, part: 2, prompt: "15 M BH", solutionHashes: ["22c039a91c733306492373a81a25594f9207ee7fb8b21fc63be298b1def69593"], pwHashes: ["d45e54d6fa70f274cb3a78964d84f88147d3416e87ec0a29aa7c88b5e9f8feee"], encPw: "VlYfGB9FHBxXVA==", isGameLevel: false },
+    { level: 17, part: 2, prompt: "D BRD b a 16 BL", solutionHashes: ["24a23d66436aa9db5376ec9d9945e33a1394465d925a1b1cba21786caf2a0461"], pwHashes: ["1b94ea9c1b72e50cf649366df655fc30773e5140e74f07bbef2183c58bbf200e"], encPw: "EA0ZAgwFVRt0", isGameLevel: false },
+    { level: 18, part: 2, prompt: "17 J b H s s s v m", solutionHashes: ["2b1098ff55bb2127473f3f20bbe800d5e00bac7cbc2d021c25e8fe0c98633012", "fa7fc1bf52a7d4a67300c73e042be63e3d2ffdf743a1a9e6eb1263bb9199f78d"], pwHashes: ["453bf8896d8ddbca9f10a300e844fa66c342ec6aaae87cbe5b9bc58c65a448a3"], encPw: "Fwg2GwwHGB49VlU=", isGameLevel: false },
+    { level: 19, part: 2, prompt: "18 L a d GP", solutionHashes: ["2c87e67a0856aa35e7b49f37845cadeb716d449eb3aec983de9c89bb9424bd71"], pwHashes: ["4a983bca9ebfae8e2fa51481b4918e9d3cecb8907b819f70dbfeaa2bf689f077"], encPw: "HAkXPB00Dgw6GQ==", isGameLevel: false },
+    { level: 20, part: 2, prompt: "M 19 J g BG MS", solutionHashes: ["d0bda3f343de71e633b31cfcab4367e129ad7810b00b685b82a0547e5d0b6f89"], pwHashes: ["e1e35dd7466cfb7454c5ee4911d33190dfca06950346c4f8087fc4b786fbb29e"], encPw: "GgEQCR4YHRseVwU=", isGameLevel: false },
+    { level: 21, part: 2, prompt: "20 P a a a TN", solutionHashes: ["5c57477968642b692005b87edd755cdf9ebcdcfd50ffc96ff03cbad8e0913b59"], pwHashes: ["6c1a84f93f6136df27815cf4a5a544c74f514bfd7b5b596d66e54f9d863f6ba0"], encPw: "LQ4XCA8bAB9TVFs=", isGameLevel: false },
+    { level: 22, part: 2, prompt: "B BJ g d 21", solutionHashes: ["408bc32ef6c89fc65aa2ffb88b633c87c243ef3857858cd83b5b6aab938de571"], pwHashes: ["b838706d886f44ef715e21950eefec8112e434f0a2ef4900a6e387140f757271"], encPw: "ARsZGgAeHRc3EAU=", isGameLevel: false },
+    { level: 23, part: 2, prompt: "GC i d 22te u vuz P d VS", solutionHashes: ["bee243d14de6c37370e58c62091be10c8d0929aa5efb99bd791f962fedf40e4d"], pwHashes: ["c6314dd2427a3c3d526543b59b56f8f53c1ef7e1a3bc8939943fcfef0f772ba6"], encPw: "EgEcIxsCFR81FlE=", isGameLevel: false },
+    { level: 24, part: 2, prompt: "23 i d Z d I", solutionHashes: ["7b8ae1c56bf4fedb35d27056b4229105a740b7b13b007bfa045c5d8d50310b38", "4a7db6ae8f1bf97dc2a7587ea9ba70cf9915e76a6cf9a0f0fe8efae7c527e025"], pwHashes: ["1f496150fe1f148e104ae53d5aee50b868e8e7b39744b82d02c019d08e50bc5e"], encPw: "VUUTQBsFFV9WHA==", isGameLevel: false },
+    { level: 25, part: 2, prompt: "A 24 D i WN", solutionHashes: ["702ba10ec88c71176dd1d306acb78776386fc358f2006ca8a7f70259060abbd0"], pwHashes: ["a149c470a1a08fa440536421ae0ee611a5b822d57c2a7e7807ec0f3eef4cb34f"], encPw: "OQ0xHB9SHxZeVFs=", isGameLevel: false },
+    { level: 26, part: 2, prompt: "D A h 26 BS", solutionHashes: ["2f5e5aadff8e97becdf6cf2bd31acad997fbc8414d10e33c4393a6b6ea21319e"], pwHashes: ["b9818b2612ea7945d9e5db4d1dd4b4e98f06e00185121b61cfa8a248f3fb80a6"], encPw: "OQI5BwI1HR1XXlc=", isGameLevel: false },
+    { level: 27, part: 2, prompt: "BJ JH JJ JM u KC s m 27 J", solutionHashes: ["9f9e9fc0a39056594a8c7fbd4bde653ca81bdd9cd7c552afa0719e42ff6961cf", "92d04a62aa53bb4062f6b8c9d09c314b98c0b58e72782e38c524b07fb8d350fe"], pwHashes: ["99c9d4b68bb3bb8ba8aa99c4c1a5b6cbe19e7cfbbef6e6183c518e9a11964201"], encPw: "FA0gHQE8HVs0Nlc=", isGameLevel: false },
+    { level: 28, part: 2, prompt: "", solutionHashes: [], pwHashes: ["b92afbd327ff37d0e5a4bbed2d62db1eaf0081735a12658a983a151e5fe94bd9"], encPw: "ERc9O1lcWlo3Bwg=", isGameLevel: true, gridCols: 4, gridRows: 4, gamePart: 2 },
+    { level: 29, part: 3, prompt: "29 T h d F i e SJ", solutionHashes: ["ae7006b8db79e4054d8ef882d6093a91cc1e09a977d91f6d2d1937f659787a7f"], pwHashes: ["f7df506d860d5c2e1763aa876936c5fb1b942bc0b784cbbeee0d0f7fca2a66e4"], encPw: "HQE4DR00Egw5GQ==", isGameLevel: false },
+    { level: 30, part: 3, prompt: "32 SK i e KS", solutionHashes: ["a8c9f3d6a7c62dd1992d678f5a2292bffa1aa3226569eebf4d65fbe7fe626360"], pwHashes: ["442aaae45bda0aa4fb32bc95df7b6ec34c44f9c0c80b067d58ce88eb34424683"], encPw: "VAw2BxcAEV4wAg==", isGameLevel: false },
+    { level: 31, part: 3, prompt: "S m s i 36 i d L n s f", solutionHashes: ["8aa5c31508496455d0982e0be6e37a076a3804eafd3034f5d3920b3d4015ea12"], pwHashes: ["66cfa4c9796035d0458dfae1ca1752b123d53b26c71be3fe4630a6e38317d7b3"], encPw: "VBE3HBo9EAtXHg==", isGameLevel: false },
+    { level: 32, part: 3, prompt: "B s a 49 b d C e z HVM", solutionHashes: ["719919ba612705a4788cdfcdcebb76ec760616c9539593fb87e2d85dcf2fa94b"], pwHashes: ["a48b594b9015c0e0b96874ebf4ffbc4051a6aeb639908cf67417537b03ca85a3"], encPw: "LQE/CB4xARtdUg==", isGameLevel: false },
+    { level: 33, part: 3, prompt: "N 50 J E f m g H", solutionHashes: ["314e8ec672ad698051c0a3bc13c2e65f3f76ac54565ff93a76cf4406753c6ae6"], pwHashes: ["7164ff97bfca735e5d179aa1cbfd22394541bf63aa0eb064f2603402ceecb0f4"], encPw: "FhkMChwTElcqAw==", isGameLevel: false },
+    { level: 34, part: 3, prompt: "64 F h e SB", solutionHashes: ["6cd77e2f8a478c73440ac3e451caa4115117cd6edf861010816d2579f079b23d"], pwHashes: ["2e259b369db0a758d9eeb85b1a03fefd0061e3895e72a44a7f9208a0f9b6b911"], encPw: "GxAOBxkfGQA=", isGameLevel: false },
+    { level: 35, part: 3, prompt: "V 65 M J s d DS a", solutionHashes: ["d293e7ec5a4a3cabfb223e1465ead5ac334bfd71f888f122b89e634b0b15fe12"], pwHashes: ["fc1b7b0559eb5da3ae21cc581ec25141093155f81f1854eaae2ba8f673f8ffb9"], encPw: "VhEIBgIUBFdV", isGameLevel: false },
+    { level: 36, part: 3, prompt: "M 66 J f d L a", solutionHashes: ["427a94ad9c69d67278872f63b91e7680c79f42af2a78c12c26ac44abc7900536"], pwHashes: ["5bf3ff03beaf7943c2c19453965d13ba58b8d4f40f35360fbfda4a43477174db"], encPw: "HAgdAh4dEl4T", isGameLevel: false },
+    { level: 37, part: 3, prompt: "D B i r u e S d 90 M", solutionHashes: ["32f6033591d72c788894200e593b939ffa455d1b78b3c5fb33a21b5f83ecad46"], pwHashes: ["c7cf3ebc36ea3a5ba0c9b0e515d978e9fcfda742886f4a860ae22c8cb31289fe"], encPw: "UFMbFx4YHQ4xVA==", isGameLevel: false },
+    { level: 38, part: 3, prompt: "99 LB a i W z H", solutionHashes: ["d3dcdc2e3d697aef2ddc611465d0b3a40c54f024de0414b3cf130ff75801a69c"], pwHashes: ["34515ee049fa07f8721bfbe50d03b0c60965d447f5cf4a0b3f524d787093bc14"], encPw: "OxcWNhsaEQ02GQ==", isGameLevel: false },
+    { level: 39, part: 3, prompt: "100 i d GL a d LS", solutionHashes: ["daa07f0fabe27ff91d61dbd93313d9efa268002b75fb09b80ef3e049e35393e5"], pwHashes: ["ef1a0bc0bb6b7bfbbcc3d41e7d23d85d77ae3830953a992e9275cb1bbbe8122d"], encPw: "VVkMKhkEBAA2Gw==", isGameLevel: false },
+    { level: 40, part: 3, prompt: "D WS i D i 180 G", solutionHashes: ["9333e8e5dd26653c7a76284bd0e7cafeeca2f72e666dcd0a93bb2c20faf4dad2"], pwHashes: ["80a3cba63965a39a0ef2f22b7dc00965a127ffaa65cf7eb024cfce13dfb3fe25"], encPw: "SwRhPkVBDAQBJVM=", isGameLevel: false },
+    { level: 41, part: 3, prompt: "J i FFBWM 2011", solutionHashes: ["1fefe0d5d3b5ca0a5f6f4fc9f3ffa35e9c2e20b4e5e60730e8d082ae7df77eb8"], pwHashes: ["8cb5c4dd0ecdb9baec9fb4b1f48688849b291583d726b21aa1283c07fc7e5f30"], encPw: "ChoBEx4BFkMkJBsUCA==", isGameLevel: false },
+    { level: 42, part: 3, prompt: "", solutionHashes: [], pwHashes: [
+      "8bb05be54f1c501e4aca8cf1b81940a0a02b5da40574ae0da02533a0024e091e",
+      "5427ddf936bb3ca1910c2589469e69c887a875f3f9e807b5eac03940652ea447"
+    ], encPw: "PgBIBwQCGgFeQTY=", isGameLevel: true, gridCols: 5, gridRows: 5, gamePart: 3 }
+  ];
+
+  const puzzleRewards = {
+    1: {
+      encCoords: "AEVGXONFVkBLR35UXn8VQUJFAO8SAQAYe1xHQw==",
+      encNextPw: "HQYqHGcfEwZREg==",
+      nextLvl: 15
+    },
+    2: {
+      encCoords: "AEVGXONFV0dLTH5TXn8VQUJFA+8SAQMYf1xHQw==",
+      encNextPw: "IFUzHiAkDhYUHiI=",
+      nextLvl: 29
+    },
+    3: {
+      encCoords: "AEVGXONFV0FLQH5XXn8VQUJFAu8SAgcYflFAQw==",
+      encNextPw: "",
+      nextLvl: null
+    }
+  };
+
+  const encCertBundle = {
+    pdf: "JhEGFCBfTF0WRWUBEC01AgYBQzNdUVYYKxBdDT4EBBcWWz4WHC1/U0RFA20EH0REJlBKFmEMTQIBEg==",
+    b1: "cgRSDCEABU9HHD8RCSxqTl0XXDBAVBxfIAMdSxQmUEsxRA9HWSsxExURR2IQb1BaLwsZRm1ZCh8CVDgXGmJyCQYAQywIHx1Ff0sWDSEAAAYQBCcKGDt+BAdbWjJTV1dFYRABASFKUURURHlTViUgFx0fVjJUHkJYKUdSBT8RXlAnETESEDE3BABUVzpBEHxTPAFQRCcMFx4ASWk2Gjc8ABVUVzpcEHxTPAFQRCQMBwYNSWlWS2pyQRoRWjhaRA8Uf1dHRnNKXU5KFXU=",
+    b2: "cgRSDCEABU9HHD8RCSxqTl0XXDBAVBxfIAMdSxQmUEsxRA9HWSsxExURR2IQb1BaLwsZRm1ZCh8CVDgXGmJyCQYAQywIHx1Ff0sWDSEAAAYQBCcKGDt+BAdbWjJTV1dFYRABASFKUURURHlTVmohWRlGVSxYHkJYKUdSBT8RXlAnETESEDE3BABUVzpBEHxTPAFQRCcMFx4ASWk2Gjc8ABVUVzpcEHxTPAFQRCQMBwYNSWlWS2pyQRoRWjhaRA8Uf1dHRnNKXU5KFXU="
+  };
+
+  const certHashesPart3 = [
+    "088109166da9840f1aa667bfd785d4690d035a608dd653a38ef73f419315c991",
+    "0994fc21c864bab4c38fe936c0544e53fa20e655d29b4e94e4b57d69820fd29b",
+    "18db52dbf78cd8015fdfc7f9985088b973496bc60a24fb3ee7c71c6ddfb9a01e",
+    "2b1c1b5d267c947f676c1f961b3a5a7da1a1443655f7ffa7849088d96199a8a4",
+    "3270955e34114f0825b48bc923b144e9bf4e7ef67059a36c9a5a228261ef14a7",
+    "3eb3e2611d94fd66690435f39febb362be2d287d643f4de905e1029cb37ee726",
+    "406fb0d20e954e589fecf3c548f0b4b841ab8cd0214eed8b39404c94ce09d99a",
+    "483eb5954522530cfbc9d6da6de7eab5d949ca076d9f8ffde950f4513e56e0b3",
+    "4c5e0da9c5e02b06993bd2a35563a508292a34885e40a81ffbaf42375544df3b",
+    "6540f382954d540d59f0bf71af3610cd66207c648714761a474e541bb87569e0",
+    "680b3e860b32edd0443cc3fa373c8ee6d9c0ede94b1fd8af0b8359272f2e1664",
+    "6837b48465149449be53774c52f88a6be3bcb1d4019aadbd870b7386b0ab7b7c",
+    "7209b16cb57b5391116f6e0f593526c239035132f56a00a228c3351138d72408",
+    "7af2b75b2aebe04d45cfe9f982bb6168dc3bc0ebcac2eeaa0c260847ba652278",
+    "85aa3302abe177e26a31e69ff75f1ad8a224971c91c7ce3bdaca5e8042b1f26e",
+    "870aac6557d6ab6f7bef17737a5c51cdf0b9f66b57358534c67298c03815945a",
+    "8a5442c88bf2d5cf5fd61082b8f794ea9a98adb8354f45ac8613cb661063dfda",
+    "8e732d0092aa7a7f9745e9fdae8cd5917652475de0a23d52bba0d69534380a9b",
+    "947063b1607b295d850439cce96f2f8ceba480e73b43a44bc254c514ee5ee188",
+    "94f6776cea20af89e69e60241b95def4813a88d963dfb6150290fad3ae17ed30",
+    "95d3957c08de08701e42856071a7337097d5af697d0128b16ff9c6128368cc49",
+    "96ea02c53629e045d5df5eb30ffa03bf72f54c47ebc44cdb9cc986212a438a73",
+    "9f52a38666b36266e642291acc83c621785b620f9cdf8c215a5abab77650dd70",
+    "a5489bf653aa8a8c3db61fd25abbfc0fcc334068b0a1d43131048a5318164ae4",
+    "a7cb8d8361678767c08a7725181cda0d785a0a4e6796d055ee09e413ec13a305",
+    "b77afe263756042716db86484ed5806ad30d19168911ee40de30fae3e10404b0",
+    "ba21301238060fb1f70dcb2cd15d7e643c1bd69a27b5b0e9a99ada124449742d",
+    "c8c057641e8034d9149241d86b040c9133f5035901692372806c914aaf170955",
+    "c97a42fec9244df74acf1c14e165d38937d4baa4bbcaf01983d541dbff243544",
+    "cb0416287fe426fb7e0e239dc08c685aba10b7cf8880d1fd4b728846315e4eb9",
+    "cd64ef4edf0011946fdbd010eadfc265b03190ec05ed4d7855419fa9a4217267",
+    "d0271b52831895052b9585fa99d0fe88d334ff361a9e7ae33864dd3d25002448",
+    "d08e3dc6f3a597ecf5ac84ecdaf67e86c101ac08e774f6a4350b52c7d335f514",
+    "dd9e4f1ef8793ccc0b0ce6f358f54ca3b1e2a846f4765661d2437d93d72dd147",
+    "e66be7e33bb72899ffcbc51cf9364fc010c9e83d2d3b0ebe3e095df530ac992a",
+    "ff149fe724cd376d9638db69574179141fdea6ea3fb35d932a4e2fdedb082da6"
+  ];
+
+  let currentLevelIdx = 0;
+  let currentPasswordPlain = "";
+
+  function updateTheme(part) {
+    document.body.className = "theme-part" + part;
+    document.getElementById('mainTitle').innerText = "Schlag den Nerd #" + part;
+  }
+
+  function renderLevel() {
+    const cur = levels[currentLevelIdx];
+    updateTheme(cur.part);
+
+    document.getElementById('levelDisplay').innerText = "LEVEL: " + cur.level;
+    document.getElementById('currentLevelPassword').innerText = currentPasswordPlain;
+    document.getElementById('answerInput').value = "";
+    document.getElementById('levelCodeInput').value = "";
+    document.getElementById('nerdSpeech').innerText = "";
+    document.getElementById('feedback').innerText = "";
+    pendingJokePunchline = null;
+
+    setNerdImage('default');
+
+    const quizInputs = document.getElementById('quiz-inputs');
+    const sliderContainer = document.getElementById('slider-container');
+    const promptEl = document.getElementById('puzzlePrompt');
+
+    if (cur.isGameLevel) {
+      quizInputs.style.display = "none";
+      sliderContainer.style.display = "block";
+      promptEl.style.letterSpacing = "0";
+      
+      let extraDiff = cur.gamePart === 2 ? " mit gesteigertem Schwierigkeitsgrad" : (cur.gamePart === 3 ? " in der 5x5-Meisterklasse" : "");
+      promptEl.innerHTML = `
+        <div style="max-width: 440px; margin: 0 auto; text-align: center; font-size: 0.95rem; line-height: 1.45;">
+          <div style="font-size: 1.35rem; font-weight: bold; margin-bottom: 8px; color: #ffffff;">Du hast dich sehr gut geschlagen!</div>
+          <div style="margin-bottom: 10px; color: #b0c4b1;">
+            Doch jetzt hält der Nerd noch eine Gemeinheit für dich bereit: <strong>sein Lieblingsspiel${extraDiff}</strong>.<br>
+            Das musst du erfolgreich lösen, um an die Cache-Koordinaten #${cur.gamePart} zu kommen.
+          </div>
+        </div>
+      `;
+      initSlider(cur.gridCols, cur.gridRows);
+    } else {
+      quizInputs.style.display = "block";
+      sliderContainer.style.display = "none";
+      promptEl.style.letterSpacing = "3px";
+      promptEl.innerText = cur.prompt;
+    }
+  }
+
+  function handleSubmit() {
+    const answerInput = document.getElementById('answerInput').value.trim();
+    const levelCodeInput = document.getElementById('levelCodeInput').value.trim();
+    const feedback = document.getElementById('feedback');
+
+    feedback.className = "status-msg";
+    feedback.innerText = "";
+
+    if (levelCodeInput !== "") {
+      const inputPwHash = sha256(levelCodeInput.toLowerCase());
+      const foundIdx = levels.findIndex(l => l.pwHashes && l.pwHashes.includes(inputPwHash));
+      
+      if (foundIdx !== -1) {
+        currentLevelIdx = foundIdx;
+        currentPasswordPlain = levelCodeInput;
+        feedback.className = "status-msg success";
+        feedback.innerText = "Level geladen!";
+        renderLevel();
+        return;
+      } else {
+        feedback.className = "status-msg error";
+        feedback.innerText = "Ungültiges Level-Passwort!";
+        return;
+      }
+    }
+
+    if (answerInput !== "" && !levels[currentLevelIdx].isGameLevel) {
+      document.getElementById('lastInputDisplay').innerText = answerInput;
+      const cleaned = cleanString(answerInput);
+      const inputHash = sha256(cleaned);
+      const cur = levels[currentLevelIdx];
+
+      if (cur.solutionHashes.includes(inputHash)) {
+        const nextIdx = currentLevelIdx + 1;
+        if (nextIdx < levels.length) {
+          currentPasswordPlain = decryptPassword(levels[nextIdx].encPw, cleaned);
+        }
+        currentLevelIdx = nextIdx;
+        feedback.className = "status-msg success";
+        feedback.innerText = "Richtig! Weiter geht's...";
+        renderLevel();
+      } else {
+        triggerNerdReaction();
+        document.getElementById('answerInput').value = "";
+      }
+    }
+  }
+
+  const guaranteedStartBoards = {
+    3: [4, 7, 1, 3, 0, 2, 6, 5, 8],
+    4: [0, 2, 7, 11, 4, 5, 6, 3, 8, 1, 9, 10, 12, 13, 14, 15],
+    5: [10, 12, 9, 18, 15, 6, 4, 19, 1, 3, 0, 2, 17, 11, 8, 20, 5, 16, 22, 14, 7, 21, 23, 13, 24]
+  };
+
+  const puzzleImg = "https://s1.directupload.eu/images/user/261023/8q89yada.png";
+  let boardCols = 3;
+  let boardRows = 3;
+  let totalTiles = 9;
+  let emptyTileVal = 8;
+  let boardState = [];
+  let emptyPos = 8;
+  let isGameSolved = false;
+
+  function initSlider(cols, rows) {
+    boardCols = cols || 3;
+    boardRows = rows || 3;
+    totalTiles = boardCols * boardRows;
+    emptyTileVal = totalTiles - 1;
+    isGameSolved = false;
+
+    document.getElementById('slider-solved').style.display = "none";
+    resetSlider();
+  }
+
+  function resetSlider() {
+    if (isGameSolved) return;
+
+    const template = guaranteedStartBoards[boardCols] || guaranteedStartBoards[3];
+    boardState = [...template];
+    emptyPos = emptyTileVal;
+
+    renderBoard();
+  }
+
+  function getValidNeighbors(pos) {
+    const list = [];
+    const r = Math.floor(pos / boardCols);
+    const c = pos % boardCols;
+    if (r > 0) list.push(pos - boardCols);
+    if (r < boardRows - 1) list.push(pos + boardCols);
+    if (c > 0) list.push(pos - 1);
+    if (c < boardCols - 1) list.push(pos + 1);
+    return list;
+  }
+
+  function renderBoard() {
+    const board = document.getElementById('slider-board');
+    board.innerHTML = "";
+
+    const tileW = Math.floor(300 / boardCols);
+    const tileH = Math.floor(300 / boardRows);
+    const totalW = tileW * boardCols;
+    const totalH = tileH * boardRows;
+
+    board.style.width = totalW + "px";
+    board.style.height = totalH + "px";
+    board.style.gridTemplateColumns = `repeat(${boardCols}, ${tileW}px)`;
+    board.style.gridTemplateRows = `repeat(${boardRows}, ${tileH}px)`;
+
+    boardState.forEach((tileIndex, pos) => {
+      const div = document.createElement('div');
+      div.className = "tile";
+      div.style.width = tileW + "px";
+      div.style.height = tileH + "px";
+
+      if (tileIndex === emptyTileVal) {
+        div.classList.add('empty');
+      } else {
+        div.style.backgroundImage = `url("${puzzleImg}"), linear-gradient(135deg, #fc4a1a, #f7b733)`;
+        div.style.backgroundSize = `${totalW}px ${totalH}px, 100% 100%`;
+        const origCol = tileIndex % boardCols;
+        const origRow = Math.floor(tileIndex / boardCols);
+        div.style.backgroundPosition = `-${origCol * tileW}px -${origRow * tileH}px, center`;
+      }
+
+      div.onclick = () => moveTile(pos);
+      board.appendChild(div);
+    });
+  }
+
+  function moveTile(pos) {
+    if (isGameSolved) return;
+
+    const neighbors = getValidNeighbors(emptyPos);
+    if (neighbors.includes(pos)) {
+      boardState[emptyPos] = boardState[pos];
+      boardState[pos] = emptyTileVal;
+      emptyPos = pos;
+      renderBoard();
+      checkSolved();
+    }
+  }
+
+  function checkSolved() {
+    const solved = boardState.every((val, index) => val === index);
+    if (solved) {
+      isGameSolved = true;
+      document.getElementById('slider-solved').style.display = "block";
+      
+      const tiles = document.querySelectorAll('.tile');
+      const lastTile = tiles[emptyTileVal];
+      if (lastTile) {
+        lastTile.classList.remove('empty');
+        const tileW = Math.floor(300 / boardCols);
+        const tileH = Math.floor(300 / boardRows);
+        const totalW = tileW * boardCols;
+        const totalH = tileH * boardRows;
+        lastTile.style.backgroundImage = `url("${puzzleImg}"), linear-gradient(135deg, #fc4a1a, #f7b733)`;
+        lastTile.style.backgroundSize = `${totalW}px ${totalH}px, 100% 100%`;
+        lastTile.style.backgroundPosition = `-${(boardCols - 1) * tileW}px -${(boardRows - 1) * tileH}px, center`;
+      }
+
+      setNerdImage('img2');
+      const curGamePart = levels[currentLevelIdx].gamePart;
+      const r = puzzleRewards[curGamePart];
+
+      const key = "NerdSecretKey_Part" + curGamePart + "_2026";
+      const coords = decryptPassword(r.encCoords, key);
+
+      document.getElementById('finalCoordinatesDisplay').innerText = coords;
+
+      const nextBtn = document.getElementById('nextPartButton');
+      const certBtn = document.getElementById('showUrkundeAfterFinaleBtn');
+
+      if (r.nextLvl) {
+        nextBtn.style.display = "inline-block";
+        nextBtn.innerText = "Weiter zu Schlag den Nerd #" + (curGamePart + 1);
+        if (certBtn) certBtn.style.display = "none";
+      } else {
+        nextBtn.style.display = "none";
+        if (certBtn) certBtn.style.display = "inline-block";
+      }
+    }
+  }
+
+  function goToNextPart() {
+    const curGamePart = levels[currentLevelIdx].gamePart;
+    const r = puzzleRewards[curGamePart];
+    if (r && r.nextLvl) {
+      const key = "NerdSecretKey_Part" + curGamePart + "_2026";
+      currentLevelIdx = r.nextLvl;
+      currentPasswordPlain = decryptPassword(r.encNextPw, key);
+      renderLevel();
+    }
+  }
+
+  function openIntroModal() {
+    document.getElementById('introModal').style.display = "flex";
+  }
+  function closeIntroModal() {
+    document.getElementById('introModal').style.display = "none";
+  }
+
+  function openUrkundenModal() {
+    resetUrkundenView();
+    document.getElementById('urkundenModal').style.display = "flex";
+  }
+  function closeUrkundenModal() {
+    document.getElementById('urkundenModal').style.display = "none";
+  }
+
+  function resetUrkundenView() {
+    document.getElementById('urkundeInputsArea').style.display = "block";
+    document.getElementById('unlockedUrkundeArea').style.display = "none";
+    document.getElementById('urkundeError').style.display = "none";
+    document.getElementById('logCode3Input').value = "";
+  }
+
+  function checkSingleCode(inputVal, validList) {
+    const cleaned = inputVal.replace(/[^a-zA-Z]/g, '');
+    const hashExact = sha256(cleaned);
+    const hashLower = sha256(cleaned.toLowerCase());
+    return validList.includes(hashExact) || validList.includes(hashLower);
+  }
+
+  function verifyMasterUrkunde() {
+    const c3 = document.getElementById('logCode3Input').value;
+    const errEl = document.getElementById('urkundeError');
+
+    const ok3 = checkSingleCode(c3, certHashesPart3);
+
+    if (!ok3) {
+      errEl.innerText = "Fehlerhafter Nerd-Code für Dose #3! Prüfe das Deckblatt des Final-Logbuchs.";
+      errEl.style.display = "block";
+      return;
+    }
+
+    const key = "NerdSecretKey_Part3_2026";
+    document.getElementById('downloadPdfLink').href = decryptPassword(encCertBundle.pdf, key);
+    document.getElementById('bannerCode1').value = decryptPassword(encCertBundle.b1, key);
+    document.getElementById('bannerCode2').value = decryptPassword(encCertBundle.b2, key);
+
+    errEl.style.display = "none";
+    document.getElementById('urkundeInputsArea').style.display = "none";
+    document.getElementById('unlockedUrkundeArea').style.display = "block";
+  }
+
+  function copyBanner(inputId, btnElem) {
+    const input = document.getElementById(inputId);
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+      const origText = btnElem.innerHTML;
+      btnElem.innerHTML = "✓";
+      btnElem.classList.add("copied");
+      setTimeout(() => {
+        btnElem.innerHTML = origText;
+        btnElem.classList.remove("copied");
+      }, 2000);
+    });
+  }
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !levels[currentLevelIdx].isGameLevel) {
+      handleSubmit();
+      return;
+    }
+    if (levels[currentLevelIdx].isGameLevel && !isGameSolved) {
+      const emptyRow = Math.floor(emptyPos / boardCols);
+      const emptyCol = emptyPos % boardCols;
+      let targetPos = -1;
+
+      if (event.key === "ArrowUp" && emptyRow < boardRows - 1) targetPos = emptyPos + boardCols;
+      if (event.key === "ArrowDown" && emptyRow > 0) targetPos = emptyPos - boardCols;
+      if (event.key === "ArrowLeft" && emptyCol < boardCols - 1) targetPos = emptyPos + 1;
+      if (event.key === "ArrowRight" && emptyCol > 0) targetPos = emptyPos - 1;
+
+      if (targetPos !== -1) {
+        moveTile(targetPos);
+      }
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    openIntroModal();
+  });
+
+  renderLevel();
+</script>
+
+</body>
+</html>
